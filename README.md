@@ -11,3 +11,6 @@ TradeCorp International reçoit chaque nuit ses données commerciales sous forme
 - Jupyter Notebook
 - AirFlow
 - Azure Data Lake Storage (ADLS)
+- Azure Coffre-Fort
+
+## Architecture

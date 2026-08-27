@@ -3,3 +3,9 @@
 # dossier pour le rendu et support de cours
 exos
 rendus
+
+# données csv sources
+data/*.csv
+
+# jupyter notebook checkpoints
+notebooks/.ipynb_checkpoints
