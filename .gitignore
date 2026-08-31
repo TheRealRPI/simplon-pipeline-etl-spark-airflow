@@ -8,7 +8,7 @@ rendus
 data/*.csv
 
 # données parquet temporaires
-data/tmp/
+data/
 
 # jupyter notebook checkpoints
 notebooks/.ipynb_checkpoints
