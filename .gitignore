@@ -12,3 +12,6 @@ data/
 
 # jupyter notebook checkpoints
 notebooks/.ipynb_checkpoints
+
+# Notebook ADLS (avec secretkey)
+notebooks/ADLS_Connect.ipynb
