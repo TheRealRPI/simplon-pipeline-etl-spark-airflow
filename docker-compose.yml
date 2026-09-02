@@ -1,9 +1,9 @@
-name: tradecorp_training
+name: tradecorp
 services:
   jupyter:
     # Image a jour pour PySpark Notebook
-    image: quay.io/jupyter/pyspark-notebook
-    container_name: tradecorp_training_spark
+    build: .
+    container_name: tradecorp_spark
     ports:
       - "8888:8888"
       - "4040:4040"
@@ -12,13 +12,14 @@ services:
       - "./data:/home/jovyan/data"
       - "./src:/home/jovyan/src"
       - "./tests:/home/jovyan/tests"
+      - "./.env:/home/jovyan/.env"
     environment:
     # driver JDBC PostgreSQL
       SPARK_OPTS: "--packages org.postgresql:postgresql:42.7.0"
   
   postgres:
     image: postgres:16
-    container_name: tradecorp_training_postgres
+    container_name: tradecorp_postgres
     environment:
       POSTGRES_USER: tradecorp
       POSTGRES_PASSWORD: tradecorp
@@ -30,7 +31,7 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4
-    container_name: tradecorp_training_pgadmin
+    container_name: tradecorp_pgadmin
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@tradecorp.com
       PGADMIN_DEFAULT_PASSWORD: admin
@@ -42,6 +43,6 @@ services:
 
 volumes:
   pgadmin_data:
-    name: tradecorp_training_pgadmin_data
+    name: tradecorp_pgadmin_data
   pgdata:
-    name: tradecorp_training_pgdata
+    name: tradecorp_pgdata
