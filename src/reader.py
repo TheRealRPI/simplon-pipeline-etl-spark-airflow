@@ -25,8 +25,10 @@ def download_blobs_from_list(blob_list, container_name, path):
 
 # Creation des DataFrames depuis les fichiers telecharges;
 # retourne un dictionnaire des Dataframes
-def create_dataframes_from_files(file_list, path):
+def create_dataframes_from_files():
     spark = get_spark_session()
+    file_list = files_to_download
+    path = r"./data/"
     df_dict = {}
     for filename in file_list:
         print(f"Creating DataFrame for {filename}...")
@@ -37,5 +39,4 @@ def create_dataframes_from_files(file_list, path):
     return df_dict
 
 
-download_blobs_from_list(files_to_download, "raw", r"./data/")
-create_dataframes_from_files(files_to_download, r"./data/")
+# download_blobs_from_list(files_to_download, "raw", r"./data/")

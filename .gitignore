@@ -15,3 +15,6 @@ notebooks/.ipynb_checkpoints
 
 # Notebook ADLS (avec secretkey)
 notebooks/ADLS_Connect.ipynb
+
+# cache Python
+src/__pycache__/
