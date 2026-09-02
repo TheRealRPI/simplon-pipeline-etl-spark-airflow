@@ -1,5 +1,6 @@
 from utils import *
 from reader import create_dataframes_from_files
+from writer import write_df_to_adls
 from pyspark.sql.functions import col, round, concat, lit
 
 # Note sur le fonctionnement de .transform() :
@@ -131,17 +132,6 @@ df_orders_enriched = build_enriched(df_dict)
 df_orders_enriched.printSchema()
 df_orders_enriched.show(5)
 
-# df_dict["customers"] = clean_customers(df_dict["customers"])
-# df_dict["customers"].show(5)
+c, k = get_azure_info()
 
-# df_dict["orders"] = clean_orders(df_dict["orders"])
-# df_dict["orders"].show(5)
-
-# df_dict["order_details"] = clean_order_details(df_dict["order_details"])
-# df_dict["order_details"].show(5)
-
-# df_dict["employees"] = clean_employees(df_dict["employees"])
-# df_dict["employees"].show(5)
-
-# df_dict["products"] = clean_products(df_dict["products"])
-# df_dict["products"].show(5)
+write_df_to_adls(df_orders_enriched, "orders_enriched", "clean", c)

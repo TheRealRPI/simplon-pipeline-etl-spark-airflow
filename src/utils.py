@@ -6,11 +6,16 @@ import pyspark.sql.functions as F
 import pyspark.sql.types as T
 
 
+def get_azure_info():
+    load_dotenv("./.env")
+    azure_container = os.getenv("AZURE_CONTAINER")
+    azure_container_key = os.getenv("AZURE_CONTAINER_KEY")
+    return azure_container, azure_container_key
+
+
 def get_blob_service_client():
     # Récupération des credentials pour Azure Blob Storage
-    load_dotenv("./.env")
-    AZURE_CONTAINER = os.getenv("AZURE_CONTAINER")
-    AZURE_CONTAINER_KEY = os.getenv("AZURE_CONTAINER_KEY")
+    AZURE_CONTAINER, AZURE_CONTAINER_KEY = get_azure_info()
     # Connection ADLS
     account_url = f"https://{AZURE_CONTAINER}.blob.core.windows.net"
     credential = AZURE_CONTAINER_KEY
@@ -25,7 +30,7 @@ def get_blob_service_client():
 # file_name: nom du fichier a telecharger
 # path: chemin du dossier dans lequel le fichier va etre telecharger
 # mode = wb pour ecrire en mode binaire (sans transformation et avec ecrasement si deja existant)
-def download_blob_to_file(container_name, file_name, path):
+def download_blob_from_file(container_name, file_name, path):
     blob_service_client = get_blob_service_client()
     blob_client = blob_service_client.get_blob_client(
         container=container_name, blob=file_name

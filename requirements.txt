@@ -1,3 +1,5 @@
+python-dotenv
 azure-storage-blob
-azure-identity
-dotenv
+requests
+pytest
+apache-airflow-providers-docker

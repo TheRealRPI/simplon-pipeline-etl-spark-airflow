@@ -1,4 +1,4 @@
-from utils import download_blob_to_file, get_spark_session
+from utils import download_blob_from_file, get_spark_session
 
 # Telechargement des documents necessaires
 
@@ -20,7 +20,7 @@ files_to_download = {
 def download_blobs_from_list(blob_list, container_name, path):
     for filename in blob_list:
         print(f"Downloading {filename}.csv...")
-        download_blob_to_file(container_name, f"{filename}.csv", path)
+        download_blob_from_file(container_name, f"{filename}.csv", path)
 
 
 # Creation des DataFrames depuis les fichiers telecharges;
@@ -39,4 +39,4 @@ def create_dataframes_from_files():
     return df_dict
 
 
-# download_blobs_from_list(files_to_download, "raw", r"./data/")
+download_blobs_from_list(files_to_download, "raw", r"./data/")
