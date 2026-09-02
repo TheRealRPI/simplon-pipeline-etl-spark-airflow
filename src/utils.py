@@ -82,8 +82,8 @@ def cast_to_type(df, col_name, type):
     match type:
         case "date":
             df = df.withColumn(col_name, F.col(col_name).cast(T.DateType()))
-        case "decimal":
-            df = df.withColumn(col_name, F.col(col_name).cast(T.DecimalType()))
+        case "double":
+            df = df.withColumn(col_name, F.col(col_name).cast(T.DoubleType()))
         case "integer":
             df = df.withColumn(col_name, F.col(col_name).cast(T.IntegerType()))
     return df
@@ -92,6 +92,12 @@ def cast_to_type(df, col_name, type):
 # Renommer une colonne
 def rename_col(df, col_name, new_name):
     df = df.withColumnRenamed(col_name, new_name)
+    return df
+
+
+# Renommer plusieurs colonnes grace a un dictionnaire {"col1" : "col1_new_name", ...}
+def rename_cols(df, dict_names):
+    df = df.withColumnsRenamed(dict_names)
     return df
 
 
