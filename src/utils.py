@@ -40,7 +40,7 @@ def download_blob_from_file(container_name, file_name, path):
         sample_blob.write(download_stream.readall())
 
 
-# Création d'une session Spark
+# Création d'une session Spark, avec intégration des credentials Azure pour le writer
 
 
 def get_spark_session(log_level="WARN"):
@@ -106,8 +106,3 @@ def rename_col(df, col_name, new_name):
 def rename_cols(df, dict_names):
     df = df.withColumnsRenamed(dict_names)
     return df
-
-
-# Ajouter une colonne avec une condition
-def add_col_with_condition(df, col_name, condition):
-    df = df.withColumn(col_name, condition)

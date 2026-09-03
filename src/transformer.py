@@ -71,13 +71,10 @@ def clean_employees(df):
     )
 
 
-# Nettoie le df Products et ajoute la colonne category_name
+# Nettoie le df Products
 def clean_products(df):
-    return (
-        df.transform(cast_to_type, "unit_price", "double")
-        .join(df_dict["categories"], on="category_id")
-        .select(df.columns + ["category_name"])
-        .withColumn("en_stock", col("units_in_stock") > 0)
+    return df.transform(cast_to_type, "unit_price", "double").withColumn(
+        "en_stock", col("units_in_stock") > 0
     )
 
 
@@ -92,6 +89,7 @@ def clean_shipper(df):
 
 
 def build_enriched(dd):
+    print("Construction du DataFrame enrichi...")
     col_to_keep = [
         "order_id",
         "customer_id",
@@ -120,6 +118,7 @@ def build_enriched(dd):
         .join(clean_orders(dd["orders"]), on="order_id")
         .join(clean_customers(dd["customers"]), on="customer_id")
         .join(clean_products(dd["products"]), on="product_id")
+        .join(dd["categories"], on="category_id")
         .join(clean_employees(dd["employees"]), on="employee_id")
         .join(clean_shipper(dd["shippers"]), on="shipper_id")
         .select(col_to_keep)
