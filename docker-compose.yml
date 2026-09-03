@@ -14,8 +14,7 @@ services:
       - "./tests:/home/jovyan/tests"
       - "./.env:/home/jovyan/.env"
     environment:
-    # driver JDBC PostgreSQL
-      SPARK_OPTS: "--packages org.postgresql:postgresql:42.7.0"
+      PYSPARK_SUBMIT_ARGS: "--packages org.apache.hadoop:hadoop-azure:3.5.0,org.postgresql:postgresql:42.7.0 pyspark-shell"
   
   postgres:
     image: postgres:16

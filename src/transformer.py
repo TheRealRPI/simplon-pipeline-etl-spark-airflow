@@ -127,11 +127,11 @@ def build_enriched(dd):
     return df
 
 
-df_dict = create_dataframes_from_files()
-df_orders_enriched = build_enriched(df_dict)
-df_orders_enriched.printSchema()
-df_orders_enriched.show(5)
+# df_dict = create_dataframes_from_files()
+# df_orders_enriched = build_enriched(df_dict)
+# df_orders_enriched.printSchema()
+# df_orders_enriched.show(5)
 
-c, k = get_azure_info()
+# storage, key = get_azure_info()
 
-write_df_to_adls(df_orders_enriched, "orders_enriched", "clean", c)
+# write_df_to_adls(df_orders_enriched, "orders_enriched", "clean", storage)

@@ -8,17 +8,17 @@ import pyspark.sql.types as T
 
 def get_azure_info():
     load_dotenv("./.env")
-    azure_container = os.getenv("AZURE_CONTAINER")
-    azure_container_key = os.getenv("AZURE_CONTAINER_KEY")
-    return azure_container, azure_container_key
+    azure_storage = os.getenv("AZURE_STORAGE")
+    azure_key = os.getenv("AZURE_KEY")
+    return azure_storage, azure_key
 
 
 def get_blob_service_client():
     # Récupération des credentials pour Azure Blob Storage
-    AZURE_CONTAINER, AZURE_CONTAINER_KEY = get_azure_info()
+    storage, key = get_azure_info()
     # Connection ADLS
-    account_url = f"https://{AZURE_CONTAINER}.blob.core.windows.net"
-    credential = AZURE_CONTAINER_KEY
+    account_url = f"https://{storage}.blob.core.windows.net"
+    credential = key
     # Create the BlobServiceClient object
     blob_service_client = BlobServiceClient(account_url, credential=credential)
     return blob_service_client
@@ -44,8 +44,10 @@ def download_blob_from_file(container_name, file_name, path):
 
 
 def get_spark_session(log_level="WARN"):
+    storage, key = get_azure_info()
     spark = SparkSession.builder.appName("TradeCorp ETL").getOrCreate()
     spark.sparkContext.setLogLevel(log_level)
+    spark.conf.set(f"fs.azure.account.key.{storage}.dfs.core.windows.net", key)
     return spark
 
 

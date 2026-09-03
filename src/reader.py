@@ -39,4 +39,4 @@ def create_dataframes_from_files():
     return df_dict
 
 
-download_blobs_from_list(files_to_download, "raw", r"./data/")
+# download_blobs_from_list(files_to_download, "raw", r"./data/")
