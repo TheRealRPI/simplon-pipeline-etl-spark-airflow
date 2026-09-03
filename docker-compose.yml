@@ -13,9 +13,9 @@ services:
       - "./src:/home/jovyan/src"
       - "./tests:/home/jovyan/tests"
       - "./.env:/home/jovyan/.env"
+      - "./log4j2.properties:/usr/local/spark/conf/log4j2.properties"
     environment:
-      PYSPARK_SUBMIT_ARGS: "--packages org.apache.hadoop:hadoop-azure:3.5.0,org.postgresql:postgresql:42.7.0 pyspark-shell"
-  
+      PYSPARK_SUBMIT_ARGS: "--packages org.apache.hadoop:hadoop-azure:3.3.4,org.postgresql:postgresql:42.7.0"
   postgres:
     image: postgres:16
     container_name: tradecorp_postgres

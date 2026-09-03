@@ -17,4 +17,4 @@ notebooks/.ipynb_checkpoints
 notebooks/ADLS_Connect.ipynb
 
 # cache Python
-src/__pycache__/
+*/__pycache__/

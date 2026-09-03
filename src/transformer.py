@@ -39,16 +39,23 @@ def clean_orders(df):
 
 
 def clean_order_details(df):
-    return (
+    col_renamed_orders_details = {
+        "unit_price": "prix_unitaire",
+        "quantity": "quantite",
+        "discount": "remise",
+    }
+    df = (
         df.transform(cast_to_type, "unit_price", "double")
         .transform(cast_to_type, "quantity", "integer")
-        .transform(rename_col, "unit_price", "prix_unitaire")
-        .transform(rename_col, "quantity", "quantite")
-        .transform(rename_col, "discount", "remise")
-        .withColumn(
-            "sous_total",
-            round((col("prix_unitaire") * col("quantite") * (1 - col("remise"))), 2),
-        )
+        .transform(rename_cols, col_renamed_orders_details)
+    )
+    return add_sous_total(df)
+
+
+def add_sous_total(df):
+    return df.withColumn(
+        "sous_total",
+        round((col("prix_unitaire") * col("quantite") * (1 - col("remise"))), 2),
     )
 
 
@@ -124,13 +131,3 @@ def build_enriched(dd):
         .select(col_to_keep)
     )
     return df
-
-
-# df_dict = create_dataframes_from_files()
-# df_orders_enriched = build_enriched(df_dict)
-# df_orders_enriched.printSchema()
-# df_orders_enriched.show(5)
-
-# storage, key = get_azure_info()
-
-# write_df_to_adls(df_orders_enriched, "orders_enriched", "clean", storage)

@@ -43,10 +43,9 @@ def download_blob_from_file(container_name, file_name, path):
 # Création d'une session Spark, avec intégration des credentials Azure pour le writer
 
 
-def get_spark_session(log_level="WARN"):
+def get_spark_session():
     storage, key = get_azure_info()
     spark = SparkSession.builder.appName("TradeCorp ETL").getOrCreate()
-    spark.sparkContext.setLogLevel(log_level)
     spark.conf.set(f"fs.azure.account.key.{storage}.dfs.core.windows.net", key)
     return spark
 
