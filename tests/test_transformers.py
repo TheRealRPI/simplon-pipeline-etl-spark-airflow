@@ -1,8 +1,10 @@
 import sys
+import os
 from pathlib import Path
 
-# Ajoute SPARK/ au path
+# Ajoute SPARK/ et SPARK/src/ au path
 sys.path.append(str(Path(__file__).parent.parent))
+sys.path.append(str(Path(__file__).parent.parent / "src"))
 
 import pytest
 from pyspark.sql import SparkSession, Row

@@ -6,7 +6,6 @@ from writer import write_df_to_adls
 # Nom sans extensions; les fichiers sont tous au format CSV; noms seront utilisés pour les DataFrames et les tables de la base de donnes
 files_list = {
     "categories",
-    "country_currency",
     "customers",
     "employees",
     "order_details",
