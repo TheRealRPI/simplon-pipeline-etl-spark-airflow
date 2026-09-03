@@ -35,7 +35,9 @@ def download_blob_from_file(container_name, file_name, path):
     blob_client = blob_service_client.get_blob_client(
         container=container_name, blob=file_name
     )
-    with open(file=os.path.join(path, file_name), mode="wb") as sample_blob:
+    full_path = os.path.join(path, file_name)
+    os.makedirs(os.path.dirname(full_path), exist_ok=True)  # Créer les dossiers parents
+    with open(file=full_path, mode="wb") as sample_blob:
         download_stream = blob_client.download_blob()
         sample_blob.write(download_stream.readall())
 
