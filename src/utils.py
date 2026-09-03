@@ -40,6 +40,23 @@ def download_blob_from_file(container_name, file_name, path):
         sample_blob.write(download_stream.readall())
 
 
+def upload_blob_file(container_name, file_name, local_path, distant_path=None):
+    blob_service_client = get_blob_service_client()
+    container_client = blob_service_client.get_container_client(
+        container=container_name
+    )
+    blob_name = (
+        file_name
+        if distant_path is None
+        else distant_path + "/" + file_name  # Ajout du chemin
+    )
+    with open(file=os.path.join(local_path, file_name), mode="rb") as data:
+        blob_client = container_client.upload_blob(
+            name=blob_name, data=data, overwrite=True
+        )
+    return blob_client
+
+
 # Création d'une session Spark, avec intégration des credentials Azure pour le writer
 
 
