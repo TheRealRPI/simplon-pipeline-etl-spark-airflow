@@ -9,6 +9,7 @@ sys.path.append(str(Path(__file__).parent.parent / "src"))
 import pytest
 from pyspark.sql import SparkSession, Row
 from src.transformer import clean_orders, add_sous_total, clean_customers
+from src.enrichment import add_currency_column
 
 
 @pytest.fixture(scope="session")
@@ -103,6 +104,8 @@ def test_clean_customers_trims_and_capitalizes(spark_session):
             city="paris",
             country="  france  ",
             phone="123456",
+            expected_customer_name="John Doe",
+            expected_customer_country="FRANCE",
         ),
         Row(
             customer_id=2,
@@ -111,26 +114,126 @@ def test_clean_customers_trims_and_capitalizes(spark_session):
             city="lyon",
             country="  usa  ",
             phone="789012",
+            expected_customer_name="Jane Smith",
+            expected_customer_country="USA",
         ),
     ]
 
     df = spark_session.createDataFrame(data)
     result_df = clean_customers(df)
 
-    # Vérifie suppression espaces + majuscule première lettre sur contact_name (renommé en customer_name)
-    contact_names = result_df.select("customer_name").collect()
-    assert (
-        contact_names[0].customer_name == "John Doe"
-    ), f"Attendu 'John Doe', obtenu '{contact_names[0].customer_name}'"
-    assert (
-        contact_names[1].customer_name == "Jane Smith"
-    ), f"Attendu 'Jane Smith', obtenu '{contact_names[1].customer_name}'"
+    # Vérifie en une seule boucle
+    results = result_df.select(
+        "customer_name", "expected_customer_name",
+        "customer_country", "expected_customer_country"
+    ).collect()
+    for row in results:
+        assert (
+            row.customer_name == row.expected_customer_name
+        ), f"Attendu {row.expected_customer_name}, obtenu {row.customer_name}"
+        assert (
+            row.customer_country == row.expected_customer_country
+        ), f"Attendu {row.expected_customer_country}, obtenu {row.customer_country}"
 
-    # Vérifie suppression espaces + majuscules sur country (renommé en customer_country)
-    countries = result_df.select("customer_country").collect()
+
+def test_add_currency_column(spark_session):
+    # Données réelles basées sur country_currency.csv et exchange_rates.json
+    # Trois pays différents avec de vraies valeurs de change + cas exotiques
+    orders_data = [
+        # Cas standard avec EUR (rate: 0.863)
+        Row(
+            customer_country="FRANCE",
+            sous_total=100.00,
+            order_id=1,
+            expected_sous_total_local=86.30,
+        ),
+        # Cas standard avec USD (rate: 1.0)
+        Row(
+            customer_country="USA",
+            sous_total=200.00,
+            order_id=2,
+            expected_sous_total_local=200.00,
+        ),
+        # Cas standard avec GBP (rate: 0.742)
+        Row(
+            customer_country="UK",
+            sous_total=300.00,
+            order_id=3,
+            expected_sous_total_local=222.60,
+        ),
+        # Cas exotique: montant très petit pour tester l'arrondi (0.01 * 0.863 = 0.00863 -> 0.01)
+        Row(
+            customer_country="FRANCE",
+            sous_total=0.01,
+            order_id=4,
+            expected_sous_total_local=0.01,
+        ),
+        # Cas exotique: montant très grand
+        Row(
+            customer_country="USA",
+            sous_total=999999.99,
+            order_id=5,
+            expected_sous_total_local=999999.99,
+        ),
+        # Cas exotique: montant zéro
+        Row(
+            customer_country="UK",
+            sous_total=0.00,
+            order_id=6,
+            expected_sous_total_local=0.00,
+        ),
+        # Cas exotique: pays sans correspondance dans currency (JAPAN n'est pas dans country_currency.csv)
+        Row(
+            customer_country="JAPAN",
+            sous_total=50.00,
+            order_id=7,
+            expected_sous_total_local=None,
+        ),
+    ]
+
+    # Données réelles depuis country_currency.csv
+    currency_data = [
+        Row(country="FRANCE", currency="EUR"),
+        Row(country="USA", currency="USD"),
+        Row(country="UK", currency="GBP"),
+        Row(country="GERMANY", currency="EUR"),
+        Row(country="SPAIN", currency="EUR"),
+    ]
+
+    # Données réelles depuis exchange_rates.json (taux par rapport à USD)
+    rates_data = [
+        Row(code_pays="EUR", rate=0.863),
+        Row(code_pays="USD", rate=1.0),
+        Row(code_pays="GBP", rate=0.742),
+        Row(code_pays="JPY", rate=159.09),
+    ]
+
+    # Création des DataFrames
+    df_orders = spark_session.createDataFrame(orders_data)
+    df_currency = spark_session.createDataFrame(currency_data)
+    df_rates = spark_session.createDataFrame(rates_data)
+
+    # Appel de la fonction
+    result_df = add_currency_column(df_orders, df_currency, df_rates)
+
+    # Vérifications
+    # 1. La colonne sous_total_local existe
     assert (
-        countries[0].customer_country == "FRANCE"
-    ), f"Attendu 'FRANCE', obtenu '{countries[0].customer_country}'"
-    assert (
-        countries[1].customer_country == "USA"
-    ), f"Attendu 'USA', obtenu '{countries[1].customer_country}'"
+        "sous_total_local" in result_df.columns
+    ), "La colonne sous_total_local est manquante"
+
+    # 2. Toutes les colonnes originales sont conservées
+    original_columns = [f.name for f in df_orders.schema.fields]
+    for col in original_columns:
+        assert (
+            col in result_df.columns
+        ), f"La colonne {col} est manquante dans le résultat"
+
+    # 3. Vérification des valeurs calculées avec de vraies données
+    results = result_df.select(
+        "sous_total_local", "expected_sous_total_local"
+    ).collect()
+    for row in results:
+        assert (
+            row.sous_total_local == row.expected_sous_total_local
+        ), f"Attendu {row.expected_sous_total_local}, obtenu {row.sous_total_local}"
