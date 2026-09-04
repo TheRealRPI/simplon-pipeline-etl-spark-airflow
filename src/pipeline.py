@@ -2,6 +2,7 @@ from utils import get_azure_info, get_spark_session
 from reader import download_blobs_from_list, create_dataframes_from_files
 from transformer import build_enriched
 from writer import write_df_to_adls
+from fetch_exchange_rates import fetch_and_upload_exchange_rates
 import logging
 
 logging.basicConfig(
@@ -44,6 +45,7 @@ try:
     logger.info("----------------------------------------")
     spark = get_spark_session()
     logger.info("Session Spark creee")
+
     # Etape 1 - Telecharger les Fichiers CSV & JSON depuis le stockage ADLS
     logger.info("==========================================")
     logger.info("ETAPE 1 : TELECHARGEMENT DES FICHIERS DEPUIS ADLS")
