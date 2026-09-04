@@ -24,6 +24,7 @@ Azure Blob Storage (raw: CSV/JSON + reference/) → Pipeline (Nettoyage + Enrich
 ├── src/                  # Code source (pipeline, reader, transformer, writer, utils, enrichment, fetch_exchange_rates)
 ├── data/                 # Données locales et fichiers de référence
 │   └── reference/        # Fichiers de référence (country_currency.csv, exchange_rates.json)
+│   └── src/              # Fichiers sources (country_currency.csv)
 ├── notebooks/            # Notebooks Jupyter pour exploration et tests
 ├── tests/                # Tests unitaires (pytest)
 │   ├── run_tests.py
@@ -86,6 +87,11 @@ docker exec tradecorp_spark python /home/jovyan/tests/run_tests.py
 ### Mettre à jour les taux de change
 ```bash
 docker exec tradecorp_spark python /home/jovyan/src/fetch_exchange_rates.py
+```
+
+### Uploader le fichier de mapping pays → devise
+```bash
+docker exec tradecorp_spark python /home/jovyan/src/upload_country_currency.py
 ```
 
 ## Configuration Azure
