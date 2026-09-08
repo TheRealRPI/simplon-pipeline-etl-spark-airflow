@@ -1,5 +1,7 @@
 import os
 import logging
+from spark_utils import get_spark_session
+from azure_utils import get_azure_info
 
 logger = logging.getLogger(__name__)
 
@@ -20,3 +22,21 @@ def write_df_to_adls(df, file_name, container_name, storage_name):
         raise
     finally:
         logger.info(f"Écriture du DataFrame {file_name} terminée")
+
+
+if __name__ == "__main__":
+    logger.info("Début du script Writer.py")
+    try:
+        # Récupération du nom du stockage ADLS
+        storage_name = get_azure_info()[0]
+        dest_container = "clean"
+        spark = get_spark_session()
+        df = spark.read.parquet("./data/tmp/enriched.parquet")
+        write_df_to_adls(df, "enriched.parquet", dest_container, storage_name)
+        logger.info("Script Writer.py exécuté avec succès")
+    except Exception as e:
+        logger.error(f"Erreur lors de l'exécution du script Writer.py: {e}")
+        raise
+    finally:
+        spark.stop()
+        logger.info("Fin du script Writer.py")

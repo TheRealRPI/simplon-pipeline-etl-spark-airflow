@@ -1,4 +1,14 @@
-from utils import *
+from spark_utils import (
+    get_spark_session,
+    trim_col,
+    camel_trim_col,
+    upper_trim_col,
+    deduplicate,
+    delete_col_if_null,
+    cast_to_type,
+    rename_col,
+    rename_cols,
+)
 from reader import create_dataframes_from_files
 from writer import write_df_to_adls
 from enrichment import add_currency_column
@@ -11,6 +21,20 @@ logger = logging.getLogger(__name__)
 # .transform(fonction, argument1, argument2)
 # => fonction(DataFrame, argument1, argument2)
 # le .transform envoie par lui meme le df en cours de transformation en premier argument de la fonction
+files_list = {
+    "categories.csv",
+    "customers.csv",
+    "employees.csv",
+    "order_details.csv",
+    "orders.csv",
+    "products.csv",
+    "shippers.csv",
+    "suppliers.csv",
+    "reference/country_currency.csv",
+    "reference/exchange_rates.json",
+}
+# Chemin du dossier de destination des CSV
+path = r"./data/"
 
 
 def clean_customers(df):
@@ -193,3 +217,16 @@ def build_enriched(dd):
         raise
     finally:
         logger.info("Construction du DataFrame enrichi terminée")
+
+
+if __name__ == "__main__":
+    try:
+        spark = get_spark_session()
+        df_dict = create_dataframes_from_files(files_list, path, spark)
+        df_enriched = build_enriched(df_dict)
+        logger.info("Ecriture du DataFrame enrichi en Parquet...")
+        df_enriched.write.mode("overwrite").parquet(r"./data/tmp/enriched.parquet")
+    except Exception as e:
+        raise
+    finally:
+        spark.stop()

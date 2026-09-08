@@ -1,7 +1,25 @@
-from utils import download_blob_from_file
+from azure_utils import download_blob_from_file
+from spark_utils import get_spark_session
 import logging
 
 logger = logging.getLogger(__name__)
+
+files_list = {
+    "categories.csv",
+    "customers.csv",
+    "employees.csv",
+    "order_details.csv",
+    "orders.csv",
+    "products.csv",
+    "shippers.csv",
+    "suppliers.csv",
+    "reference/country_currency.csv",
+    "reference/exchange_rates.json",
+}
+# Nom du conteneur source dans le stockage ADLS
+src_container = "raw"
+# Chemin du dossier de destination des CSV
+path = r"./data/"
 
 
 # Telechargement des blobs dans un dossier local depuis une liste
@@ -72,3 +90,7 @@ def create_dataframes_from_files(file_list, path, spark):
             f"Processus de création des DataFrames terminé. {len(df_dict)} DataFrames créés"
         )
     return df_dict
+
+
+if __name__ == "__main__":
+    download_blobs_from_list(files_list, src_container, path)

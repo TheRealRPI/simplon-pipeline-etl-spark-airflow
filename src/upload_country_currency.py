@@ -1,4 +1,4 @@
-from utils import upload_blob_file
+from azure_utils import upload_blob_file
 
 
 # Telecharge le fichier ./data/src/country_currency.csv vers le container ADLS raw dans le dossier reference

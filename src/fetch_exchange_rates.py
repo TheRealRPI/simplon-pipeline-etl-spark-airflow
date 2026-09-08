@@ -1,6 +1,6 @@
 import requests
 import json
-from utils import get_blob_service_client
+from azure_utils import get_blob_service_client
 import logging
 
 logging.basicConfig(
@@ -25,7 +25,7 @@ def fetch_and_upload_exchange_rates():
             {"code_pays": code, "rate": float(rate)}
             for code, rate in data["rates"].items()
         ]
-        logger.info("Transformation terminee")
+        logger.info(f"Transformation terminee; {len(rates_list)} devises.")
 
         logger.info("Upload vers ADLS...")
         blob_service_client = get_blob_service_client()

@@ -1,4 +1,5 @@
-from utils import get_azure_info, get_spark_session
+from azure_utils import get_azure_info
+from spark_utils import get_spark_session
 from reader import download_blobs_from_list, create_dataframes_from_files
 from transformer import build_enriched
 from writer import write_df_to_adls

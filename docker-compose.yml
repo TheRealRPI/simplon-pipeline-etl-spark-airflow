@@ -1,8 +1,9 @@
 name: tradecorp
 services:
-  jupyter:
-    # Image a jour pour PySpark Notebook
-    build: .
+  spark:
+    build:
+      context: .
+      dockerfile: Dockerfile.spark
     container_name: tradecorp_spark
     ports:
       - "8888:8888"
@@ -20,28 +21,40 @@ services:
     image: postgres:16
     container_name: tradecorp_postgres
     environment:
-      POSTGRES_USER: tradecorp
-      POSTGRES_PASSWORD: tradecorp
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
       POSTGRES_DB: tradecorp
     ports:
       - "5434:5432"
     volumes:
      - "pgdata:/var/lib/postgresql/data"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d tradecorp"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: tradecorp_pgadmin
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@tradecorp.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-      PGADMIN_LISTEN_PORT: 8080
-    ports:
+  airflow:
+    build: 
+      context: .
+      dockerfile: Dockerfile.airflow
+    container_name: tradecorp_airflow
+    ports: 
       - "8080:8080"
-    volumes: 
-      - "pgadmin_data:/var/lib/pgadmin"
+    volumes:
+      - "./dags:/opt/airflow/dags"
+      - "./src:/opt/airflow/src"
+      - "./.env:/opt/airflow/.env"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://admin:admin@postgres:5432/tradecorp
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      _AIRFLOW_WWW_USER_USERNAME: admin
+      _AIRFLOW_WWW_USER_PASSWORD: admin
 
 volumes:
-  pgadmin_data:
-    name: tradecorp_pgadmin_data
   pgdata:
     name: tradecorp_pgdata

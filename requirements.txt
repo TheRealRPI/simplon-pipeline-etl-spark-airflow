@@ -3,3 +3,4 @@ azure-storage-blob
 requests
 pytest
 apache-airflow-providers-docker
+apache-airflow-providers-postgres

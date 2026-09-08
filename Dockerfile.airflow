@@ -1,0 +1,8 @@
+FROM apache/airflow:2.8.4-python3.11
+
+# Install the application dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+ENTRYPOINT []
+CMD bash -c "airflow standalone & sleep 15 && airflow users delete --username admin && airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@tradecorp.com && wait"

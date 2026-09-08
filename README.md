@@ -124,3 +124,17 @@ TheRealRPI - Data Engineer Consultant pour TradeCorp International
 
 ## License
 Projet académique - Simplon.co
+
+## Ariflow (logs et questions)
+
+Tach fetch_exchange_rates
+[2026-09-08, 14:05:30 CEST] {subprocess.py:93} INFO - 2026-09-08 12:05:30,803 INFO fetch_exchange_rates: Transformation terminee; 166 devises.
+
+Tache writer
+[2026-09-08, 13:51:51 CEST] {docker.py:429} INFO - 2026-09-08 11:51:51,616 INFO __main__: DataFrame enriched.parquet écrit avec succès
+
+Options du DAG
+start_date=datetime(2026, 9, 1),  # date à partir de laquelle il "existe"
+catchup=False,  # ne pas rattraper le passé
+
+Le catchup=False indique a Airflow de ne pas rattraper les executions de taches pour les dates manquantes entre aujourd'hui et le start_date
