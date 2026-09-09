@@ -65,7 +65,8 @@ def clean_orders(df):
     logger.info("Début du nettoyage du DataFrame orders")
     try:
         return (
-            df.transform(delete_col_if_null, "shipped_date")
+            df.transform(deduplicate, "order_id")
+            .transform(delete_col_if_null, "shipped_date")
             .transform(cast_to_type, "order_date", "date")
             .transform(cast_to_type, "required_date", "date")
             .transform(cast_to_type, "shipped_date", "date")
@@ -200,14 +201,29 @@ def build_enriched(dd):
             "full_name",
             "shipper_name",
         ]
+        # Si les données grandissent (> 100 Mo) :
+        # Ajouter repartition(n, "clé") avant les joins sur les gros DataFrames.
+        # Utiliser coalesce(m) à la fin pour l’écriture (1 partition = ~100-200 Mo).
         df = (
             clean_order_details(dd["order_details"])
             .join(clean_orders(dd["orders"]), on="order_id")
-            .join(clean_customers(dd["customers"]), on="customer_id")
-            .join(clean_products(dd["products"]), on="product_id")
+            .join(
+                clean_customers(dd["customers"]),
+                on="customer_id",
+            )
+            .join(
+                clean_products(dd["products"]),
+                on="product_id",
+            )
             .join(dd["categories"], on="category_id")
-            .join(clean_employees(dd["employees"]), on="employee_id")
-            .join(clean_shipper(dd["shippers"]), on="shipper_id")
+            .join(
+                clean_employees(dd["employees"]),
+                on="employee_id",
+            )
+            .join(
+                clean_shipper(dd["shippers"]),
+                on="shipper_id",
+            )
             .select(col_to_keep)
         )
         df = add_currency_column(df, dd["country_currency"], dd["exchange_rates"])

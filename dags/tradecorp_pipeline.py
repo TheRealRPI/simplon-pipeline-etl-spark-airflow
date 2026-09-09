@@ -15,6 +15,7 @@ mount_list = [
         source="//c/Users/Utilisateur/TP-CODE/SPARK/src",
         target="/home/jovyan/src",
         type="bind",
+        read_only=True,
     ),
     Mount(
         source="//c/Users/Utilisateur/TP-CODE/SPARK/data",
@@ -25,6 +26,7 @@ mount_list = [
         source="//c/Users/Utilisateur/TP-CODE/SPARK/.env",
         target="/home/jovyan/.env",
         type="bind",
+        read_only=True,
     ),
 ]
 
