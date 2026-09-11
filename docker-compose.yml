@@ -46,11 +46,13 @@ services:
       - "./src:/opt/airflow/src"
       - "./.env:/opt/airflow/.env"
       - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./data/trigger:/opt/airflow/data/trigger"
     depends_on:
       postgres:
         condition: service_healthy
     environment:
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://admin:admin@postgres:5432/tradecorp
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
       _AIRFLOW_WWW_USER_USERNAME: admin
       _AIRFLOW_WWW_USER_PASSWORD: admin

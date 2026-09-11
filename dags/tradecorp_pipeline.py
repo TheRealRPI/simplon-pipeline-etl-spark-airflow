@@ -1,6 +1,7 @@
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.providers.docker.operators.docker import DockerOperator
+from airflow.sensors.filesystem import FileSensor
 from docker.types import Mount
 from datetime import datetime, timedelta
 
@@ -78,4 +79,11 @@ with DAG(
         mounts=mount_list,
     )
 
-    fetch_exchange_rates >> reader >> transformer >> writer
+    gogogadgetogo = FileSensor(
+        task_id="wait_file_for_the_go",
+        filepath="/opt/airflow/data/trigger/go.txt",  # chemin du fichier attendu
+        poke_interval=30,  # temps avant nouvelle verifications, en seconde
+        timeout=3600,  # temps avant abandon, en secondes
+    )
+
+    gogogadgetogo >> fetch_exchange_rates >> reader >> transformer >> writer
